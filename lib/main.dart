@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Functions/Funciones.dart' as Clases;
 
 void main() => runApp(MyApp());
 
@@ -65,6 +66,7 @@ class _PagoMovilState extends State<PagoMovil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: appBar,
       backgroundColor: Color(0xFF1F222B),
       body: Container(
@@ -141,7 +143,8 @@ class _PagoMovilState extends State<PagoMovil> {
                         ),
                         child: IconButton(
                           icon: Icon(Icons.qr_code_scanner),
-                          onPressed: () {},
+                          onPressed: () {
+                          },
                           color: Colors.white,
                         ),
                       ),
