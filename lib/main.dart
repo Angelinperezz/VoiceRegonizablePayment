@@ -213,7 +213,7 @@ class _PagoMovilState extends State<PagoMovil> {
           await textToSpeech("Porfavor indique solo números");
         } else {
           await textToSpeech("El monto a pagar es " + _text + "?");
-          numeroMagico++;
+          numeroMagico=20;
         }
         break;
 
@@ -271,6 +271,12 @@ class _PagoMovilState extends State<PagoMovil> {
           await textToSpeech("No entendí, podría repetir?");
         }
         break;
+
+      case 20:
+        await textToSpeech("Pago registrado exitosamente");
+
+        break;
+
     }
 
     _startListening();
