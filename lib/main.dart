@@ -194,12 +194,6 @@ class _PagoMovilState extends State<PagoMovil> {
         }
         break;
       case 2:
-        await textToSpeech("Usted dijo " + _text);
-        if (_text.contains("si")) {
-          _showPaymentProcessing(context);
-          _showPaymentSuccess(context);
-        }
-        break;
         if (_text.isEmpty) break;
         var lista = Clases.SearchDestinatario().filtro(_text);
         if (lista.isEmpty) {
@@ -235,7 +229,7 @@ class _PagoMovilState extends State<PagoMovil> {
           await textToSpeech("Porfavor indique solo números");
         } else {
           await textToSpeech("El monto a pagar es " + _text + "?");
-          numeroMagico++;
+          numeroMagico=20;
         }
         break;
 
@@ -292,6 +286,11 @@ class _PagoMovilState extends State<PagoMovil> {
         } else {
           await textToSpeech("No entendí, podría repetir?");
         }
+        break;
+
+      case 20:
+        await textToSpeech("Pago registrado exitosamente");
+
         break;
     }
 
