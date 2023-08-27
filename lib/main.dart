@@ -172,12 +172,6 @@ class _PagoMovilState extends State<PagoMovil> {
         }
         break;
       case 2:
-        await textToSpeech("Usted dijo " + _text);
-        if (_text.contains("si")) {
-          _showPaymentProcessing(context);
-          _showPaymentSuccess(context);
-        }
-        break;
         if (_text.isEmpty) break;
         var lista = Clases.SearchDestinatario().filtro(_text);
         if (lista.isEmpty) {
