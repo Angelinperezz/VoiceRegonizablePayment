@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'Functions/Funciones.dart' as Clases;
-
+import 'package:flutter_tts/flutter_tts.dart';
 void main() => runApp(MyApp());
 
 const List<String> account = <String>['Cuenta Corriente ****0412'];
@@ -130,6 +130,20 @@ class _PagoMovilState extends State<PagoMovil> {
 
   String dropdownValue = account.first;
 
+
+
+ FlutterTts flutterTts = FlutterTts();
+
+  void textToSpeech(String text) async {
+    await flutterTts.setLanguage("es-MX");
+    await flutterTts.setVolume(1.0);
+    await flutterTts.setSpeechRate(1);
+    await flutterTts.setPitch(3);
+    await flutterTts.speak(text);
+  }
+
+
+    //textToSpeech('texto');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
