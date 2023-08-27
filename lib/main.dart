@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'Functions/Funciones.dart' as Clases;
+import 'package:flutter_tts/flutter_tts.dart';
 
 void main() => runApp(MyApp());
 
-const List<String> account = <String>['Cuenta Corriente ****0412'];
+const List<String> account = <String>['Cuenta Corriente ****0356'];
 
 class MyApp extends StatelessWidget {
   @override
@@ -26,6 +30,7 @@ class _PagoMovilState extends State<PagoMovil> {
   final _phoneCtrl = TextEditingController();
   final _cedCtrl = TextEditingController();
   final _bankCtrl = TextEditingController();
+  final _amount = TextEditingController();
 
   final List<String> _codigos = ['0412', '0414', '0416', '0424', '0426'];
   final List<String> _tiposCed = ['V-', 'E-', 'J-', 'P-', 'G-'];
@@ -37,6 +42,77 @@ class _PagoMovilState extends State<PagoMovil> {
     'Banco Fondo Común'
     // Agrega aquí más opciones de banco si lo necesitas
   ];
+
+  final SpeechToText _speech = SpeechToText();
+  SpeechToText _speechToText = SpeechToText();
+  bool _isListening = false;
+  String _text = '';
+  String _lastWords = '';
+  String nuevoTexto = '';
+  String finalTexto = '';
+  int numeroMagico = 0;
+  bool registrado = true;
+
+  void _initSpeech() async {
+    _isListening = await _speechToText.initialize();
+    setState(() {});
+  }
+
+  void _startListening() async {
+    setState(() {
+      _text = '';
+    });
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (status) {
+          print('Speech status: $status');
+          if (status == 'notListening') {
+            _stopListening();
+            hablar();
+          }
+        },
+        onError: (error) {
+          print('Error: $error');
+        },
+      );
+
+      if (available) {
+        var locales = await _speech.locales();
+        print(locales.length);
+
+        setState(() {
+          _isListening = true;
+        });
+        _speech.listen(
+          onResult: (result) {
+            // Handle recognized speech result here
+            _text = result.recognizedWords;
+          },
+          listenFor: Duration(seconds: 5),
+        );
+      }
+    }
+  }
+
+  void _stopListening() {
+    if (_isListening) {
+      _speech.stop();
+      setState(() {
+        _isListening = false;
+      });
+    }
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _lastWords = result.recognizedWords;
+    });
+  }
+
+  String concatResult() {
+    finalTexto = "$nuevoTexto $_lastWords";
+    return "$nuevoTexto $_lastWords";
+  }
 
   final appBar = AppBar(
     leading: IconButton(
@@ -84,6 +160,260 @@ class _PagoMovilState extends State<PagoMovil> {
 
   String dropdownValue = account.first;
 
+  FlutterTts flutterTts = FlutterTts();
+
+  Future textToSpeech(String text) async {
+    await flutterTts.awaitSpeakCompletion(true);
+    await flutterTts.setLanguage("es-VE");
+    await flutterTts.setVolume(1.0);
+    await flutterTts.setSpeechRate(1.0);
+    await flutterTts.setPitch(0);
+    await flutterTts.speak(text);
+  }
+
+  void hablar() async {
+    switch (numeroMagico) {
+      case 0:
+        await textToSpeech(
+            "Bienvenido al asistente de pagos de Banesco. Desea realizar un pago a un contacto ¿frecuente? ");
+        numeroMagico++;
+        break;
+      case 1:
+        if (_text.isEmpty) break;
+        if (_text.toLowerCase().contains("si") ||
+            _text.toLowerCase().contains("see")) {
+          await textToSpeech("Diga el nombre de su contacto");
+          registrado = true;
+          numeroMagico++;
+        } else if (_text.toLowerCase().contains("no")) {
+          await textToSpeech(
+              "Para realizar el pago se necesitan los datos del destinatario. Por favor diga el número de teléfono");
+          numeroMagico = 5;
+        } else {
+          await textToSpeech("No entendí, podría repetir?");
+        }
+        break;
+      case 2:
+        await textToSpeech("Usted dijo " + _text);
+        if (_text.contains("si")) {
+          _showPaymentProcessing(context);
+          _showPaymentSuccess(context);
+        }
+        break;
+        if (_text.isEmpty) break;
+        var lista = Clases.SearchDestinatario().filtro(_text);
+        if (lista.isEmpty) {
+          await textToSpeech("No se encontraron coincidencias para" + _text);
+        } else if (lista.length == 1) {
+          await textToSpeech("Desea pagarle a " + lista[0].alias + "?");
+          numeroMagico++;
+        } else {
+          await textToSpeech("Se encontraron " +
+              lista.length.toString() +
+              " coincidencias para " +
+              _text);
+        }
+        break;
+      case 3:
+        if (_text.isEmpty) break;
+        if (_text.toLowerCase().contains("si") ||
+            _text.toLowerCase().contains("see")) {
+          await textToSpeech("Indique el monto a pagar");
+          numeroMagico++;
+        } else if (_text.toLowerCase().contains("no")) {
+          await textToSpeech(
+              "Gracias por utilizar el servicio de pago movil de Banesco");
+          numeroMagico = 1000;
+        } else {
+          await textToSpeech("No entendí, podría repetir?");
+        }
+        break;
+      case 4:
+        if (_text.isEmpty) break;
+        if (int.tryParse(_text) == null) {
+          print(_text);
+          await textToSpeech("Porfavor indique solo números");
+        } else {
+          await textToSpeech("El monto a pagar es " + _text + "?");
+          numeroMagico++;
+        }
+        break;
+
+      case 5:
+        if (_text.isEmpty) break;
+
+        await textToSpeech(
+            "El numero de telefono indicado es " + _text + "¿correcto?");
+        numeroMagico++;
+        break;
+
+      case 6:
+        if (_text.toLowerCase().contains("si") ||
+            _text.toLowerCase().contains("see")) {
+          numeroMagico++;
+        } else {
+          await textToSpeech("No entendí, podría repetir?");
+        }
+
+      case 7:
+        await textToSpeech("Indique el banco del destinatario");
+        numeroMagico++;
+
+        break;
+      case 8:
+        if (_text.isEmpty) break;
+        await textToSpeech(
+            "El banco del destinatario es " + _text + "¿correcto?");
+        numeroMagico++;
+        break;
+
+      case 9:
+        if (_text.toLowerCase().contains("si") ||
+            _text.toLowerCase().contains("see")) {
+          numeroMagico++;
+        } else {
+          await textToSpeech("No entendí, podría repetir?");
+        }
+        break;
+      case 10:
+        await textToSpeech("Indique la cedula del destinatario");
+        numeroMagico++;
+        break;
+
+      case 11:
+        await textToSpeech(
+            "El numero de cedula indicado es " + _text + "¿correcto?");
+        numeroMagico++;
+        break;
+      case 12:
+        if (_text.toLowerCase().contains("si") ||
+            _text.toLowerCase().contains("see")) {
+          numeroMagico = 3;
+        } else {
+          await textToSpeech("No entendí, podría repetir?");
+        }
+        break;
+    }
+
+    _startListening();
+  }
+
+  void _showPaymentProcessing(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: 5), () {
+          Navigator.of(context).pop();
+          // Aquí puedes continuar con la operación después del intervalo de 20 segundos
+        });
+        return Container(
+          height: 300,
+          color: Color(0xFF007A51),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Procesando su pago",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
+              ),
+              SizedBox(height: 16),
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showPaymentSuccess(BuildContext context) {
+    String referencia = "002983982"; // Número de referencia ficticio
+    String fecha = "27/08/2023";
+    String cuenta = "****0356"; // Número de cuenta ficticio
+    String telefono = _phoneCtrl.text; // Número de teléfono ficticio
+    String monto = _amount.text;
+    String concepto = "Pago de servicio"; // Concepto
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 300,
+          color: Color(0xFF007A51),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Operación exitosa",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                "Desde mi cuenta",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "$cuenta - $telefono",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Monto: \$$monto",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Concepto: $concepto",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                "Número de referencia: $referencia",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Fecha: $fecha",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    _bankCtrl.clear();
+    _cedCtrl.clear();
+    _phoneCtrl.clear();
+    _amount.clear();
+  }
+
+  //textToSpeech('texto');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -275,6 +605,7 @@ class _PagoMovilState extends State<PagoMovil> {
                           fontSize: 14,
                         ),
                       ),
+
                       Row(
                         children: <Widget>[
                           Expanded(
@@ -326,6 +657,7 @@ class _PagoMovilState extends State<PagoMovil> {
                       Text(
                         'Banco',
                         style: TextStyle(
+
                           color: Colors.white,
                           fontSize: 14,
                         ),
@@ -345,6 +677,7 @@ class _PagoMovilState extends State<PagoMovil> {
                     ],
                   ),
                   SizedBox(height: 16),
+
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -411,6 +744,7 @@ class _PagoMovilState extends State<PagoMovil> {
                 ],
               ),
             ),
+
           ),
         ));
   }
