@@ -130,7 +130,28 @@ class _PagoMovilState extends State<PagoMovil> {
                         ),
                         child: IconButton(
                           icon: Icon(Icons.mic),
-                          onPressed: () {},
+                          onPressed: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Container(
+                                    height: 300,
+                                    color: Color(0xFF007A51),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          color: Color(0xFF1F222B),
+                                          child: TextFormField(
+                                            
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                });
+                          },
                           color: Colors.white,
                         ),
                       ),
@@ -275,11 +296,13 @@ class _PagoMovilState extends State<PagoMovil> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ElevatedButton(
-                    onPressed: () {}, // Aquí debes agregar el código para cancelar el pago
+                    onPressed:
+                        () {}, // Aquí debes agregar el código para cancelar el pago
                     child: Text('Atrás'),
                   ),
                   ElevatedButton(
-                    onPressed: () {}, // Aquí debes agregar el código para aceptar el pago
+                    onPressed:
+                        () {}, // Aquí debes agregar el código para aceptar el pago
                     child: Text('Aceptar'),
                   ),
                 ],
