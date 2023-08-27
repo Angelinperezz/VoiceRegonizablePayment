@@ -52,10 +52,11 @@ class SearchDestinatario{
 
   List<Destinatario> filtro(String alias) {
     List<Destinatario> listaDestinatarios = [
-      Destinatario('Amigo1','258','04125596633','0102'),
-      Destinatario('Amigo2','123','04120798865','0102'),
-      Destinatario('Familia','125','04120298865','0102'),
-      Destinatario('Familia2','143','04121798865','0102'),
+      Destinatario('Marco','258','04125596633','0102'),
+      Destinatario('Eduardo','123','04120798865','0102'),
+      Destinatario('Jose','125','04120298865','0102'),
+      Destinatario('Angelin','143','04121798865','0102'),
+      Destinatario('Cesar','145','04121798762','0102')
       // Agregar más destinatarios aquí
     ];
 
