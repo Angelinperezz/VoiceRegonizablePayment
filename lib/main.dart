@@ -136,6 +136,28 @@ class _PagoMovilState extends State<PagoMovil> {
     ],
   );
 
+  final bottomBar = BottomNavigationBar(
+    backgroundColor: Color(0xFF3B4455),
+    selectedItemColor: Colors.white,
+    items: const <BottomNavigationBarItem>[
+      BottomNavigationBarItem(
+        icon: Icon(Icons.phone_android_rounded),
+        label: 'PAGO MÓVIL',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.paid, color: Colors.grey),
+        label: 'TRANSFERIR',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(
+          Icons.lightbulb,
+          color: Colors.grey,
+        ),
+        label: 'SERVICIOS',
+      ),
+    ],
+  );
+
   String dropdownValue = account.first;
 
   FlutterTts flutterTts = FlutterTts();
@@ -400,161 +422,184 @@ class _PagoMovilState extends State<PagoMovil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar,
-      backgroundColor: Color(0xFF1F222B),
-      body: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Color(0xFF3B4455),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InputDecorator(
-                decoration: const InputDecoration(border: OutlineInputBorder()),
-                child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                  value: dropdownValue,
-                  style: const TextStyle(color: Colors.white),
-                  onChanged: (String? value) {
-                    setState(() {
-                      dropdownValue = value!;
-                    });
-                  },
-                  items: account.map<DropdownMenuItem<String>>((value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value, style: TextStyle(color: Colors.black)),
-                    );
-                  }).toList(),
-                  iconSize: 30,
-                )),
-              ),
-              SizedBox(height: 16),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                      child: Container(
-                    child: const Text(
-                      'Ingrese los datos del beneficiario o seleccione un Pago Frecuente',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+        appBar: appBar,
+        backgroundColor: Color(0xFF1F222B),
+        bottomNavigationBar: bottomBar,
+        body: SingleChildScrollView(
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Color(0xFF3B4455),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InputDecorator(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.all(5),
                     ),
-                  )),
+                    child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                      value: dropdownValue,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      onChanged: (String? value) {
+                        setState(() {
+                          dropdownValue = value!;
+                        });
+                      },
+                      items: account.map<DropdownMenuItem<String>>((value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value,
+                              style: TextStyle(color: Colors.black)),
+                        );
+                      }).toList(),
+                      iconSize: 30,
+                    )),
+                  ),
+                  SizedBox(height: 16),
                   Row(
                     children: <Widget>[
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Color(0xFF007A51),
+                      Expanded(
+                          child: Container(
+                        child: const Text(
+                          'Ingrese los datos del beneficiario o seleccione un Pago Frecuente',
+                          style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
-                        child: IconButton(
-                          icon: Icon(Icons.people_outline),
-                          onPressed: () {},
+                      )),
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Color(0xFF007A51),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.people_outline),
+                              onPressed: () {},
+                              color: Colors.white,
+                            ),
+                          ),
+                          const VerticalDivider(
+                            width: 20,
+                            thickness: 1,
+                            indent: 20,
+                            endIndent: 0,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 8),
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Color(0xFF007A51),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.qr_code_scanner),
+                              onPressed: () {},
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Color(0xFF007A51),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.mic),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        height: 300,
+                                        color: Color(0xFF007A51),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              color: Color(0xFF1F222B),
+                                              child: TextFormField(),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    });
+                              },
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Número de teléfono',
+                        style: TextStyle(
                           color: Colors.white,
+                          fontSize: 14,
                         ),
                       ),
-                      const VerticalDivider(
-                        width: 20,
-                        thickness: 1,
-                        indent: 20,
-                        endIndent: 0,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 8),
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Color(0xFF007A51),
-                        ),
-                        child: IconButton(
-                          icon: Icon(Icons.qr_code_scanner),
-                          onPressed: () {},
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Color(0xFF007A51),
-                        ),
-                        child: IconButton(
-                          icon: Icon(Icons.mic),
-                          onPressed: () {
-                            if (numeroMagico == 1000) numeroMagico = 0;
-                            hablar();
-                            if (!_isListening) {
-                              /*showModalBottomSheet(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      height: 300,
-                                      color: Color(0xFF007A51),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            color: Color(0xFF1F222B),
-                                            child: TextFormField(),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  });*/
-                            }
-                          },
-                          color: Colors.white,
-                        ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: InputDecorator(
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.all(5),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      value: _selectedCod,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedCod = value!;
+                                        });
+                                      },
+                                      items: _codigos
+                                          .map<DropdownMenuItem<String>>((cod) {
+                                        return DropdownMenuItem<String>(
+                                          value: cod,
+                                          child: Text(cod),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ))),
+                          SizedBox(width: 8),
+                          Expanded(
+                              flex: 3,
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Número de teléfono',
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                ),
+                                keyboardType: TextInputType.phone,
+                                controller: _phoneCtrl,
+                              ))
+                        ],
                       ),
                     ],
-                  )
-                ],
-              ),
-              SizedBox(height: 16),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Ingrese el número de teléfono',
-                  labelText: 'Número de teléfono',
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(6),
                   ),
-                  prefixIcon: DropdownButton<String>(
-                    value: _selectedCod,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedCod = value!;
-                      });
-                    },
-                    items: _codigos.map<DropdownMenuItem<String>>((cod) {
-                      return DropdownMenuItem<String>(
-                        value: cod,
-                        child: Text(cod),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                keyboardType: TextInputType.phone,
-                maxLength: 7,
-                controller: _phoneCtrl,
-              ),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                  SizedBox(height: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -565,118 +610,147 @@ class _PagoMovilState extends State<PagoMovil> {
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(height: 8),
-                      DropdownButton<String>(
-                        value: _selectedCed,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedCed = value!;
-                          });
-                        },
-                        items: _tiposCed.map<DropdownMenuItem<String>>((tipo) {
-                          return DropdownMenuItem<String>(
-                            value: tipo,
-                            child: Text(tipo),
-                          );
-                        }).toList(),
+
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: InputDecorator(
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.all(5),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      value: _selectedCed,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedCed = value!;
+                                        });
+                                      },
+                                      items: _tiposCed
+                                          .map<DropdownMenuItem<String>>(
+                                              (tipo) {
+                                        return DropdownMenuItem<String>(
+                                          value: tipo,
+                                          child: Text(tipo),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ))),
+                          SizedBox(width: 8),
+                          Expanded(
+                              flex: 3,
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Cedula de identidad',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                ),
+                                keyboardType: TextInputType.number,
+                                controller: _cedCtrl,
+                              )),
+                          SizedBox(width: 16),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Introduzca el número de cédula',
-                        fillColor: Colors.white,
-                        filled: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide.none,
+                  SizedBox(height: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Banco',
+                        style: TextStyle(
+
+                          color: Colors.white,
+                          fontSize: 14,
                         ),
                       ),
-                      keyboardType: TextInputType.number,
-                      maxLength: 7, // Solo admite 7 dígitos
-                      controller: _cedCtrl,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Seleccione el banco',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Banco',
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide.none,
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Banco',
+                          fillColor: Colors.white,
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        controller: _bankCtrl,
                       ),
-                    ),
-                    controller: _bankCtrl,
+                    ],
                   ),
-                ],
-              ),
-              SizedBox(height: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Introduzca el monto',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Monto',
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    controller: _amount,
-                    keyboardType: TextInputType.number,
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  _showPaymentProcessing(context);
-                  Future.delayed(Duration(seconds: 2), () {
-                    _showPaymentSuccess(context);
-                    //  Navigator.of(context).pop();
-                  });
-                }, // Aquí debes agregar el código para aceptar el pago
+                  SizedBox(height: 16),
 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF007A51),
-                  minimumSize: const Size.fromHeight(40),
-                ),
-                child: Text(
-                  'ACEPTAR',
-                  style: TextStyle(fontSize: 16),
-                ),
-              )
-            ],
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Monto',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Monto',
+                          fillColor: Colors.white,
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Concepto',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Concepto',
+                          fillColor: Colors.white,
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed:
+                        () {}, // Aquí debes agregar el código para aceptar el pago
+
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF007A51),
+                      minimumSize: const Size.fromHeight(40),
+                    ),
+                    child: Text(
+                      'ACEPTAR',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  )
+                ],
+              ),
+            ),
+
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
