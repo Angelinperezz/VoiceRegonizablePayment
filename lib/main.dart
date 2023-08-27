@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 void main() => runApp(MyApp());
 
@@ -35,6 +37,43 @@ class _PagoMovilState extends State<PagoMovil> {
     'Banco Fondo Común'
     // Agrega aquí más opciones de banco si lo necesitas
   ];
+
+  final SpeechToText _speech = SpeechToText();
+  bool _isListening = false;
+
+  void _startListening() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (status) {
+          print('Speech status: $status');
+        },
+        onError: (error) {
+          print('Error: $error');
+        },
+      );
+
+      if (available) {
+        setState(() {
+          _isListening = true;
+        });
+        _speech.listen(
+          onResult: (result) {
+            // Handle recognized speech result here
+            print('Result: ${result.recognizedWords}');
+          },
+        );
+      }
+    }
+  }
+
+  void _stopListening() {
+    if (_isListening) {
+      _speech.stop();
+      setState(() {
+        _isListening = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,9 +182,7 @@ class _PagoMovilState extends State<PagoMovil> {
                                       children: [
                                         Container(
                                           color: Color(0xFF1F222B),
-                                          child: TextFormField(
-                                            
-                                          ),
+                                          child: TextFormField(),
                                         ),
                                       ],
                                     ),
