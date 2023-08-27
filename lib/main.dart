@@ -12,8 +12,29 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class PagoMovil extends StatelessWidget {
-  const PagoMovil({Key? key}) : super(key: key);
+class PagoMovil extends StatefulWidget {
+  @override
+  _PagoMovilState createState() => _PagoMovilState();
+}
+
+class _PagoMovilState extends State<PagoMovil> {
+  String _selectedCod = '0414';
+  String _selectedCed = 'V-';
+  String _selectedBank = '';
+  final _phoneCtrl = TextEditingController();
+  final _cedCtrl = TextEditingController();
+  final _bankCtrl = TextEditingController();
+
+  final List<String> _codigos = ['0412', '0414', '0416', '0424', '0426'];
+  final List<String> _tiposCed = ['V-', 'E-', 'J-', 'P-', 'G-'];
+  final List<String> _bancos = [
+    'Banco Banesco',
+    'Banco BBVA',
+    'Banco de Venezuela',
+    'Bancaribe',
+    'Banco Fondo Común'
+    // Agrega aquí más opciones de banco si lo necesitas
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +60,18 @@ class PagoMovil extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 16),
+              Text(
+                'Ingrese los datos del beneficiario o seleccione un Pago Frecuente',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+              SizedBox(height: 8),
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Ingrese los datos del beneficiario',
+                  hintText: 'Nombres y apellidos o número del beneficiario',
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -55,7 +85,7 @@ class PagoMovil extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Ingrese los datos del beneficiario o seleccione un Pago Frecuente',
+                    'Buscar Pago Frecuente',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -105,6 +135,152 @@ class PagoMovil extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Ingrese el número de teléfono',
+                  labelText: 'Número de teléfono',
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  prefixIcon: DropdownButton<String>(
+                    value: _selectedCod,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCod = value!;
+                      });
+                    },
+                    items: _codigos.map<DropdownMenuItem<String>>((cod) {
+                      return DropdownMenuItem<String>(
+                        value: cod,
+                        child: Text(cod),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                keyboardType: TextInputType.phone,
+                maxLength: 10,
+                controller: _phoneCtrl,
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Cedula de identidad',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      DropdownButton<String>(
+                        value: _selectedCed,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCed = value!;
+                          });
+                        },
+                        items: _tiposCed.map<DropdownMenuItem<String>>((tipo) {
+                          return DropdownMenuItem<String>(
+                            value: tipo,
+                            child: Text(tipo),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Introduzca el número de cédula',
+                        fillColor: Colors.white,
+                        filled: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      maxLength: 7, // Solo admite 7 dígitos
+                      controller: _cedCtrl,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Seleccione el banco',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Banco',
+                      fillColor: Colors.white,
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    controller: _bankCtrl,
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Introduzca el monto',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Monto',
+                      fillColor: Colors.white,
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {}, // Aquí debes agregar el código para cancelar el pago
+                    child: Text('Atrás'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {}, // Aquí debes agregar el código para aceptar el pago
+                    child: Text('Aceptar'),
                   ),
                 ],
               ),
