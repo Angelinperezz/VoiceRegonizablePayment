@@ -5,7 +5,7 @@ import 'Functions/Funciones.dart' as Clases;
 import 'package:flutter_tts/flutter_tts.dart';
 void main() => runApp(MyApp());
 
-const List<String> account = <String>['Cuenta Corriente ****0412'];
+const List<String> account = <String>['Cuenta Corriente ****0356'];
 
 class MyApp extends StatelessWidget {
   @override
@@ -29,6 +29,7 @@ class _PagoMovilState extends State<PagoMovil> {
   final _phoneCtrl = TextEditingController();
   final _cedCtrl = TextEditingController();
   final _bankCtrl = TextEditingController();
+  final _amount = TextEditingController();
 
   final List<String> _codigos = ['0412', '0414', '0416', '0424', '0426'];
   final List<String> _tiposCed = ['V-', 'E-', 'J-', 'P-', 'G-'];
@@ -50,6 +51,7 @@ class _PagoMovilState extends State<PagoMovil> {
   String nuevoTexto = '';
   String finalTexto = '';
   int numeroMagico = 0;
+  String textValue = ''; // Debes definir una variable que almacene el valor del Texto
 
   void _initSpeech() async {
     _isListening = await _speechToText.initialize();
@@ -140,15 +142,16 @@ class _PagoMovilState extends State<PagoMovil> {
     await flutterTts.awaitSpeakCompletion(true);
     await flutterTts.setLanguage("es-VE");
     await flutterTts.setVolume(1.0);
-    await flutterTts.setSpeechRate(1);
+    await flutterTts.setSpeechRate(.9);
     await flutterTts.setPitch(0);
+    await flutterTts.setVoice({'name': 'Google español de Estados Unidos', 'locale': 'es-US'});
     await flutterTts.speak(text);
   }
 
   void hablar() async{
     switch (numeroMagico){
       case 0:
-        await textToSpeech("Bienvenido al assistente de pago movil de Banesco, desea realizar un pago a un contacto registrado?");
+        await textToSpeech("Bienvenido al asistente de pagos de Banesco. Desea realizar un pago a un contacto ¿frecuente? ");
         numeroMagico++;
         break;
       case 1:
@@ -156,10 +159,131 @@ class _PagoMovilState extends State<PagoMovil> {
         numeroMagico++;
         break;
       case 2:
-        await textToSpeech("Usted dijo "+_text);
+        await textToSpeech("Usted dijo "+ _text);
+        if(_text.contains("si")) {
+          _showPaymentProcessing(context);
+          _showPaymentSuccess(context);
+        }
+        break;
     }
    
     _startListening();
+  }
+
+  void _showPaymentProcessing(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: 5), () {
+          Navigator.of(context).pop();
+          // Aquí puedes continuar con la operación después del intervalo de 20 segundos
+        });
+        return Container(
+          height: 300,
+          color: Color(0xFF007A51),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Procesando su pago",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
+              ),
+              SizedBox(height: 16),
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showPaymentSuccess(BuildContext context) {
+    String referencia = "002983982"; // Número de referencia ficticio
+    String fecha = "27/08/2023";
+    String cuenta = "****0356"; // Número de cuenta ficticio
+    String telefono = _phoneCtrl.text; // Número de teléfono ficticio
+    String monto = _amount.text;
+    String concepto = "Pago de servicio"; // Concepto
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 300,
+          color: Color(0xFF007A51),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Operación exitosa",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                "Desde mi cuenta",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "$cuenta - $telefono",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Monto: \$$monto",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Concepto: $concepto",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                "Número de referencia: $referencia",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Fecha: $fecha",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    _bankCtrl.clear();
+    _cedCtrl.clear();
+    _phoneCtrl.clear();
+    _amount.clear();
+
   }
 
     //textToSpeech('texto');
@@ -311,12 +435,13 @@ class _PagoMovilState extends State<PagoMovil> {
                       return DropdownMenuItem<String>(
                         value: cod,
                         child: Text(cod),
+
                       );
                     }).toList(),
                   ),
                 ),
                 keyboardType: TextInputType.phone,
-                maxLength: 10,
+                maxLength: 7,
                 controller: _phoneCtrl,
               ),
               SizedBox(height: 16),
@@ -417,6 +542,7 @@ class _PagoMovilState extends State<PagoMovil> {
                         borderSide: BorderSide.none,
                       ),
                     ),
+                    controller: _amount,
                     keyboardType: TextInputType.number,
                   ),
                 ],
@@ -424,7 +550,15 @@ class _PagoMovilState extends State<PagoMovil> {
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed:
-                    () {}, // Aquí debes agregar el código para aceptar el pago
+                    () {
+                    _showPaymentProcessing(context);
+                    Future.delayed(Duration(seconds: 2), () {
+                      _showPaymentSuccess(context);
+                     //  Navigator.of(context).pop();
+
+                    });
+
+                    }, // Aquí debes agregar el código para aceptar el pago
 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF007A51),
