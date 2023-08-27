@@ -155,7 +155,26 @@ class _PagoMovilState extends State<PagoMovil> {
                         ),
                         child: IconButton(
                           icon: Icon(Icons.mic),
-                          onPressed: () {},
+                          onPressed: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Container(
+                                    height: 300,
+                                    color: Color(0xFF007A51),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          color: Color(0xFF1F222B),
+                                          child: TextFormField(),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                });
+                          },
                           color: Colors.white,
                         ),
                       ),
