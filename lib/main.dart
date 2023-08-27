@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:voiceregonizablepayment/speech.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,8 +14,56 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class PagoMovil extends StatelessWidget {
+class PagoMovil extends StatefulWidget {
   const PagoMovil({Key? key}) : super(key: key);
+
+  @override
+  _PagoMovilState createState() => _PagoMovilState();
+}
+
+class _PagoMovilState extends State<PagoMovil> {
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
+
+  void _startListening() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (status) {
+          print('Speech status: $status');
+        },
+        onError: (error) {
+          print('Error: $error');
+        },
+      );
+
+      if (available) {
+        setState(() {
+          _isListening = true;
+        });
+        _speech.listen(
+          onResult: (result) {
+            // Handle recognized speech result here
+            print('Result: ${result.recognizedWords}');
+          },
+        );
+      }
+    }
+  }
+
+  void _stopListening() {
+    if (_isListening) {
+      _speech.stop();
+      setState(() {
+        _isListening = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _speech.stop();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +79,7 @@ class PagoMovil extends StatelessWidget {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 5,
               blurRadius: 7,
-              offset: Offset(0, 2), // changes position of shadow
+              offset: Offset(0, 2),
             ),
           ],
         ),
@@ -71,6 +121,26 @@ class PagoMovil extends StatelessWidget {
                           color: Color(0xFF007A51),
                         ),
                         child: IconButton(
+                          icon: Icon(_isListening ? Icons.mic_off : Icons.mic),
+                          onPressed: () {
+                            if (_isListening) {
+                              _stopListening();
+                            } else {
+                              _startListening();
+                            }
+                          },
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Color(0xFF007A51),
+                        ),
+                        child: IconButton(
                           icon: Icon(Icons.people_outline),
                           onPressed: () {},
                           color: Colors.white,
@@ -86,20 +156,6 @@ class PagoMovil extends StatelessWidget {
                         ),
                         child: IconButton(
                           icon: Icon(Icons.qr_code_scanner),
-                          onPressed: () {},
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Color(0xFF007A51),
-                        ),
-                        child: IconButton(
-                          icon: Icon(Icons.mic),
                           onPressed: () {},
                           color: Colors.white,
                         ),
