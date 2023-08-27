@@ -138,10 +138,10 @@ class _PagoMovilState extends State<PagoMovil> {
 
   Future textToSpeech(String text) async {
     await flutterTts.awaitSpeakCompletion(true);
-    await flutterTts.setLanguage("es-MX");
+    await flutterTts.setLanguage("es-VE");
     await flutterTts.setVolume(1.0);
     await flutterTts.setSpeechRate(1);
-    await flutterTts.setPitch(3);
+    await flutterTts.setPitch(0);
     await flutterTts.speak(text);
   }
 
