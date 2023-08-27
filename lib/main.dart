@@ -276,7 +276,6 @@ class _PagoMovilState extends State<PagoMovil> {
         await textToSpeech("Pago registrado exitosamente");
 
         break;
-
     }
 
     _startListening();
