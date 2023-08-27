@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-import 'package:speech_to_text/speech_to_text.dart';
+import 'Functions/Funciones.dart' as Clases;
 
 void main() => runApp(MyApp());
+
+const List<String> account = <String>['Cuenta Corriente ****0412'];
 
 class MyApp extends StatelessWidget {
   @override
@@ -38,6 +40,7 @@ class _PagoMovilState extends State<PagoMovil> {
     'Banco Fondo Común'
     // Agrega aquí más opciones de banco si lo necesitas
   ];
+
 
   final SpeechToText _speech = SpeechToText();
   SpeechToText _speechToText = SpeechToText();
@@ -103,24 +106,41 @@ class _PagoMovilState extends State<PagoMovil> {
     finalTexto = "$nuevoTexto $_lastWords";
     return "$nuevoTexto $_lastWords";
   }
+  final appBar = AppBar(
+    leading: IconButton(
+        icon: Icon(
+          Icons.chevron_left,
+          color: Colors.white,
+          size: 24,
+        ),
+        onPressed: () => ()),
+    title: const Text('Enviar Pago'),
+    backgroundColor: Color(0xFF1F8C6D),
+    centerTitle: false,
+    actions: <Widget>[
+      IconButton(
+          onPressed: () => (),
+          icon: Icon(
+            Icons.logout,
+            color: Colors.white,
+            size: 24,
+          ))
+    ],
+  );
+
+  String dropdownValue = account.first;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      appBar: appBar,
       backgroundColor: Color(0xFF1F222B),
       body: Container(
         margin: EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: Color(0xFF3B4455),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, 2), // changes position of shadow
-            ),
-          ],
         ),
         child: Padding(
           padding: EdgeInsets.all(16.0),
@@ -128,39 +148,38 @@ class _PagoMovilState extends State<PagoMovil> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 16),
-              Text(
-                'Ingrese los datos del beneficiario o seleccione un Pago Frecuente',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                ),
-              ),
-              SizedBox(height: 8),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Nombres y apellidos o número del beneficiario',
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                ),
+              InputDecorator(
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+                child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                  value: dropdownValue,
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (String? value) {
+                    setState(() {
+                      dropdownValue = value!;
+                    });
+                  },
+                  items: account.map<DropdownMenuItem<String>>((value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value, style: TextStyle(color: Colors.black)),
+                    );
+                  }).toList(),
+                  iconSize: 30,
+                )),
               ),
               SizedBox(height: 16),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Buscar Pago Frecuente',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
+                children: <Widget>[
+                  Expanded(
+                      child: Container(
+                    child: const Text(
+                      'Ingrese los datos del beneficiario o seleccione un Pago Frecuente',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
-                  ),
+                  )),
                   Row(
-                    children: [
+                    children: <Widget>[
                       Container(
                         width: 40,
                         height: 40,
@@ -174,6 +193,13 @@ class _PagoMovilState extends State<PagoMovil> {
                           color: Colors.white,
                         ),
                       ),
+                      const VerticalDivider(
+                        width: 20,
+                        thickness: 1,
+                        indent: 20,
+                        endIndent: 0,
+                        color: Colors.white,
+                      ),
                       SizedBox(width: 8),
                       Container(
                         width: 40,
@@ -184,7 +210,8 @@ class _PagoMovilState extends State<PagoMovil> {
                         ),
                         child: IconButton(
                           icon: Icon(Icons.qr_code_scanner),
-                          onPressed: () {},
+                          onPressed: () {
+                          },
                           color: Colors.white,
                         ),
                       ),
@@ -222,12 +249,13 @@ class _PagoMovilState extends State<PagoMovil> {
                                     );
                                   });
                             }
+
                           },
                           color: Colors.white,
                         ),
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
               SizedBox(height: 16),
@@ -363,21 +391,19 @@ class _PagoMovilState extends State<PagoMovil> {
                 ],
               ),
               SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed:
-                        () {}, // Aquí debes agregar el código para cancelar el pago
-                    child: Text('Atrás'),
-                  ),
-                  ElevatedButton(
-                    onPressed:
-                        () {}, // Aquí debes agregar el código para aceptar el pago
-                    child: Text('Aceptar'),
-                  ),
-                ],
-              ),
+              ElevatedButton(
+                onPressed:
+                    () {}, // Aquí debes agregar el código para aceptar el pago
+
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF007A51),
+                  minimumSize: const Size.fromHeight(40),
+                ),
+                child: Text(
+                  'ACEPTAR',
+                  style: TextStyle(fontSize: 16),
+                ),
+              )
             ],
           ),
         ),
