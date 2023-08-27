@@ -49,6 +49,7 @@ class _PagoMovilState extends State<PagoMovil> {
   String _lastWords = '';
   String nuevoTexto = '';
   String finalTexto = '';
+  int numeroMagico = 0;
 
   void _initSpeech() async {
     _isListening = await _speechToText.initialize();
@@ -64,7 +65,8 @@ class _PagoMovilState extends State<PagoMovil> {
         onStatus: (status) {
           print('Speech status: $status');
           if (status == 'notListening') {
-            print(_text);
+            _stopListening();
+            hablar();
           }
         },
         onError: (error) {
@@ -134,7 +136,8 @@ class _PagoMovilState extends State<PagoMovil> {
 
  FlutterTts flutterTts = FlutterTts();
 
-  void textToSpeech(String text) async {
+  Future textToSpeech(String text) async {
+    await flutterTts.awaitSpeakCompletion(true);
     await flutterTts.setLanguage("es-MX");
     await flutterTts.setVolume(1.0);
     await flutterTts.setSpeechRate(1);
@@ -142,6 +145,22 @@ class _PagoMovilState extends State<PagoMovil> {
     await flutterTts.speak(text);
   }
 
+  void hablar() async{
+    switch (numeroMagico){
+      case 0:
+        await textToSpeech("Bienvenido al assistente de pago movil de Banesco, desea realizar un pago a un contacto registrado?");
+        numeroMagico++;
+        break;
+      case 1:
+        await textToSpeech("Diga el nombre de su contacto");
+        numeroMagico++;
+        break;
+      case 2:
+        await textToSpeech("Usted dijo "+_text);
+    }
+   
+    _startListening();
+  }
 
     //textToSpeech('texto');
   @override
@@ -240,10 +259,8 @@ class _PagoMovilState extends State<PagoMovil> {
                         child: IconButton(
                           icon: Icon(Icons.mic),
                           onPressed: () {
-                            if (_isListening) {
-                              _stopListening();
-                            } else {
-                              _startListening();
+                            hablar();
+                            if (!_isListening) {
                               showModalBottomSheet(
                                   context: context,
                                   builder: (BuildContext context) {
