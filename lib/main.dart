@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -39,13 +40,29 @@ class _PagoMovilState extends State<PagoMovil> {
   ];
 
   final SpeechToText _speech = SpeechToText();
+  SpeechToText _speechToText = SpeechToText();
   bool _isListening = false;
+  String _text = '';
+  String _lastWords = '';
+  String nuevoTexto = '';
+  String finalTexto = '';
+
+  void _initSpeech() async {
+    _isListening = await _speechToText.initialize();
+    setState(() {});
+  }
 
   void _startListening() async {
+    setState(() {
+      _text = '';
+    });
     if (!_isListening) {
       bool available = await _speech.initialize(
         onStatus: (status) {
           print('Speech status: $status');
+          if (status == 'notListening') {
+            print(_text);
+          }
         },
         onError: (error) {
           print('Error: $error');
@@ -59,8 +76,9 @@ class _PagoMovilState extends State<PagoMovil> {
         _speech.listen(
           onResult: (result) {
             // Handle recognized speech result here
-            print('Result: ${result.recognizedWords}');
+            _text = result.recognizedWords;
           },
+          listenFor: Duration(seconds: 5),
         );
       }
     }
@@ -73,6 +91,17 @@ class _PagoMovilState extends State<PagoMovil> {
         _isListening = false;
       });
     }
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _lastWords = result.recognizedWords;
+    });
+  }
+
+  String concatResult() {
+    finalTexto = "$nuevoTexto $_lastWords";
+    return "$nuevoTexto $_lastWords";
   }
 
   @override
@@ -170,24 +199,29 @@ class _PagoMovilState extends State<PagoMovil> {
                         child: IconButton(
                           icon: Icon(Icons.mic),
                           onPressed: () {
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Container(
-                                    height: 300,
-                                    color: Color(0xFF007A51),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          color: Color(0xFF1F222B),
-                                          child: TextFormField(),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                });
+                            if (_isListening) {
+                              _stopListening();
+                            } else {
+                              _startListening();
+                              showModalBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      height: 300,
+                                      color: Color(0xFF007A51),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            color: Color(0xFF1F222B),
+                                            child: TextFormField(),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            }
                           },
                           color: Colors.white,
                         ),
